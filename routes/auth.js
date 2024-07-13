@@ -79,7 +79,7 @@ router.post("/register", async (req, res) => {
       .json({ success: true, message: "Registration successful!" });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: error });
   }
 });
 
