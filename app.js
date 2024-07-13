@@ -25,12 +25,13 @@ const chatCollection = "chats";
 const userCollection = "onlineUsers";
 const server = http.createServer(app);
 const io = socketIO(server);
-const database = "mongodb://127.0.0.1:27017/";
+
 const Rating = require("./models/Ratings");
 const User = require("./models/User");
 require("dotenv").config();
 // Database connection setup
 const mongoUri = process.env.MONGO_URI_PRODUCTION; // Use local URI by default
+const database = mongoUri;
 
 mongoose
   .connect(mongoUri, {
