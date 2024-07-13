@@ -5,24 +5,12 @@ const session = require("express-session");
 const app = express();
 const MongoDBStore = require("connect-mongodb-session")(session);
 const port = 3000;
-const ejs = require("ejs");
 const path = require("path");
 const Book = require("./models/Book");
 const socketIO = require("socket.io");
 const http = require("http");
-// const server = http.createServer(app);
-// const WebSocket = require('ws');
-const router = express.Router();
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const multer = require("multer");
-const formatMessage = require("./utils/chatMessage");
-const mongoClient = require("mongodb").MongoClient;
-const dbname = "Bookstore1";
-const chatCollection = "chats";
-const userCollection = "onlineUsers";
 const server = http.createServer(app);
 const io = socketIO(server);
 
@@ -30,15 +18,12 @@ const Rating = require("./models/Ratings");
 const User = require("./models/User");
 require("dotenv").config();
 // Database connection setup
-const mongoUri = process.env.MONGO_URI_PRODUCTION; // Use local URI by default
-const database = mongoUri;
+const mongoUri = process.env.MONGO_URI_PRODUCTION;
 
 mongoose
   .connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    connectTimeoutMS: 30000, // Increase to 30 seconds
-    socketTimeoutMS: 30000, // Increase to 30 seconds
   })
   .then(() => {
     console.log("MongoDB connected");
@@ -46,19 +31,6 @@ mongoose
   .catch((err) => {
     console.error("MongoDB connection error", err);
   });
-
-// // Database connection setup
-// mongoose
-//   .connect("mongodb://127.0.0.1:27017/Bookstore1", {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   })
-//   .then(() => {
-//     console.log("MongoDB connected");
-//   })
-//   .catch((err) => {
-//     console.error("MongoDB connection error", err);
-//   });
 
 // Middleware setup
 app.use(express.static("public"));
@@ -414,114 +386,6 @@ app.post("/submit-rating-review", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// // Function to handle MongoDB connection
-// function connectToMongo(callback) {
-//   mongoClient.connect(database, (err, client) => {
-//     if (err) {
-//       console.error("Failed to connect to MongoDB:", err);
-//       return;
-//     }
-//     const db = client.db(dbname);
-//     const onlineUsers = db.collection(userCollection);
-//     const chat = db.collection(chatCollection);
-//     callback(client, db, onlineUsers, chat);
-//   });
-// }
-
-// io.on("connection", (socket) => {
-//   // console.log("New User Logged In with ID " + socket.id);
-//   // console.log("here33");
-//   socket.on("chatMessage", async (data) => {
-//     // console.log("here34");
-//     const dataElement = formatMessage(data);
-//     // console.log(dataElement);
-//     // console.log(data.toUser);
-//     connectToMongo((client, db, onlineUsers, chat) => {
-//       chat.insertOne(dataElement, (err, res) => {
-//         if (err) {
-//           console.error("Failed to insert message into database:", err);
-//           client.close();
-//           return;
-//         }
-//         socket.emit("message", dataElement);
-//         // console.log(data.toUser);
-//         // console.log(onlineUsers);
-//         // const ele = onlineUsers.findOne({ name: data.toUser });
-//         // console.log("ELE");
-//         // console.log(ele);
-//         onlineUsers.findOne({ name: data.toUser }, (err, res) => {
-//           // console.log("ressss", res);
-//           if (err) {
-//             console.error("Failed to find online user:", err);
-//             client.close();
-//             return;
-//           }
-//           if (res != null) {
-//             // console.log(res);
-//             // location.reload();
-//             socket.to(res.ID).emit("message", dataElement);
-//             // location.reload();
-//           }
-//         });
-//         // client.close();
-//       });
-//     });
-//   });
-
-//   socket.on("userDetails", async (data) => {
-//     connectToMongo((client, db, onlineUsers, currentCollection) => {
-//       // const id = data.bookId;
-//       const onlineUser = {
-//         ID: socket.id,
-//         name: data.fromUser,
-//       };
-//       onlineUsers.insertOne(onlineUser, (err, res) => {
-//         if (err) {
-//           console.error("Failed to insert online user:", err);
-//           client.close();
-//           return;
-//         }
-//         console.log(onlineUser.name + " is online...");
-//         currentCollection
-//           .find(
-//             {
-//               // from: { $in: [data.fromUser, data.toUser] },
-//               // to: { $in: [data.fromUser, data.toUser] },
-//               bookId: { $in: [data.bookId, data.bookId] },
-//             },
-//             { projection: { _id: 0 } }
-//           )
-//           .toArray((err, res) => {
-//             if (err) {
-//               console.error("Failed to find chat history:", err);
-//               client.close();
-//               return;
-//             }
-//             socket.emit("output", res);
-//             client.close();
-//           });
-//       });
-//     });
-//   });
-
-//   //   const userID = socket.id;
-//   //   socket.on("disconnect", () => {
-//   //     connectToMongo((client, db, onlineUsers) => {
-//   //       const myquery = { ID: userID };
-//   //       onlineUsers.deleteOne(myquery, (err, res) => {
-//   //         if (err) {
-//   //           console.error("Failed to delete offline user:", err);
-//   //           client.close();
-//   //           return;
-//   //         }
-//   //         // console.log("User " + userID + " went offline...");
-//   //         client.close();
-//   //       });
-//   //     });
-//   //   });
-// });
-
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
