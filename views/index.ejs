@@ -149,7 +149,7 @@
                 <div class="swiper-wrapper">
                     <% books.forEach(function(book) { %>
                         <div class="swiper-slide">
-                            <a href="/bookDetails?id=<%= book.id %>" class="image-link">
+                            <a href="/bookdetails?id=<%= book.id %>" class="image-link">
                                 <img src="<%= book.image %>" alt="<%= book.title %>">
                             </a>
                         </div>
@@ -223,7 +223,7 @@
                             <a href="#" class="fas fa-shopping-cart open-cart-btn"></a>
                         </div>
                         <div class="image">
-                            <a href="/bookDetails?id=<%= book.id %>"><img src="<%= book.image %>"
+                            <a href="/bookdetails?id=<%= book.id %>"><img src="<%= book.image %>"
                                     alt="<%= book.title %>"></a>
                         </div>
                         <div class="content">

@@ -159,7 +159,7 @@ app.get("/bookdetails", async (req, res) => {
   try {
     const book = await Book.findById(bookId);
     if (book) {
-      res.render("bookDetails", { book, showDropdown, user });
+      res.render("bookdetails", { book, showDropdown, user });
     } else {
       // res.status(404).send('Book not found');
       res.status(404).send(`
@@ -187,7 +187,7 @@ app.get("/search", async (req, res) => {
         { author: { $regex: new RegExp(query, "i") } },
       ],
     });
-    res.render("searchResults", { results, query, showDropdown, user }); // Pass results to the view
+    res.render("searchresults", { results, query, showDropdown, user }); // Pass results to the view
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
