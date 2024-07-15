@@ -3,6 +3,10 @@ import cv2
 import os
 
 try:
+    # Check if a filename was provided
+    if len(sys.argv) < 2:
+        raise ValueError("No filename provided. Please specify an image file.")
+
     # Get the filename from the command-line arguments
     filename = sys.argv[1]
     filepath = 'public/uploads/' + filename
