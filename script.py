@@ -1,21 +1,28 @@
 import sys
 import cv2
+import requests
+import numpy as np
 import os
 
 try:
-    # Check if a filename was provided
+    # Check if a Cloudinary URL was provided
     if len(sys.argv) < 2:
-        raise ValueError("No filename provided. Please specify an image file.")
+        raise ValueError("No Cloudinary URL provided. Please specify an image URL.")
 
-    # Get the filename from the command-line arguments
-    filename = sys.argv[1]
-    filepath = 'public/uploads/' + filename
-    print(f"Loading image from: {filepath}")
+    # Get the Cloudinary URL from command-line arguments
+    cloudinary_url = sys.argv[1]
+    print(f"Loading image from Cloudinary URL: {cloudinary_url}")
 
-    # Load the image
-    image = cv2.imread(filepath)
+    # Download the image from Cloudinary
+    response = requests.get(cloudinary_url)
+    if response.status_code != 200:
+        raise ValueError(f"Failed to download image from Cloudinary URL: {cloudinary_url}")
+
+    # Convert the response content to a NumPy array and decode the image
+    image_array = np.asarray(bytearray(response.content), dtype=np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     if image is None:
-        raise ValueError(f"Image not found at path: {filepath}")
+        raise ValueError("Failed to decode the image.")
 
     # Convert the image to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -37,13 +44,12 @@ try:
     # Crop the image to this bounding rectangle
     cropped = image[y:y+h, x:x+w]
 
-    # Overwrite the original image file with the cropped image
-    _, file_extension = os.path.splitext(filepath)
-    cropped_filename = filepath if file_extension else filepath + ".jpg"
-    cv2.imwrite(cropped_filename, cropped)
+    # Save the processed image to a temporary file
+    temp_filename = "processed_image.jpg"
+    cv2.imwrite(temp_filename, cropped)
 
     # Print the path to the processed image
-    print(cropped_filename)
+    print(temp_filename)
 
 except Exception as e:
     print(f"Error: {str(e)}")

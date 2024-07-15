@@ -67,13 +67,19 @@ router.post(
 
       const filename = req.file.filename;
       const filePath = path.join("public", "uploads", filename);
-      console.log(filename);
-      console.log(filePath);
-
       console.log("Uploaded file name:", filename);
 
+      // Upload the image to Cloudinary first
+      const cloudinaryResult = await uploadOnCloudinary(filePath);
+      if (!cloudinaryResult) {
+        throw new Error("Failed to upload image to Cloudinary.");
+      }
+
+      const cloudinaryUrl = cloudinaryResult.secure_url;
+      console.log("Uploaded file URL:", cloudinaryUrl);
+
       // Call the Python script to process the image
-      const python = spawn("python", ["./script.py", filename]);
+      const python = spawn("python", ["./script.py", cloudinaryUrl]);
 
       // Log output from Python script
       python.stdout.on("data", (data) => {
@@ -92,15 +98,6 @@ router.post(
             .status(500)
             .json({ success: false, message: "Internal server error." });
         }
-        // Upload the image to Cloudinary
-        const result = await uploadOnCloudinary("public/uploads/" + filename);
-        if (!result) {
-          throw new Error("Failed to upload image to Cloudinary.");
-        }
-
-        const cloudinaryUrl = result.secure_url;
-
-        console.log("Uploaded file URL:", cloudinaryUrl);
 
         // Create a new book object
         const newBook = new Book({
@@ -112,7 +109,7 @@ router.post(
           price,
           publisher,
           language,
-          image: cloudinaryUrl, // Save the path to the processed image in the database
+          image: cloudinaryUrl, // Save the Cloudinary URL in the database
           userEmail,
           quantity,
           category,
@@ -121,8 +118,6 @@ router.post(
         });
 
         // Save the book to the database
-        console.log(filename);
-        console.log(filePath);
         await newBook.save();
 
         res
