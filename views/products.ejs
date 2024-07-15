@@ -9,7 +9,8 @@
     <style>
       /* SidebarWithHeader */
       .sidebar {
-        width: 250px; /* Adjust width as needed */
+        width: 250px;
+        /* Adjust width as needed */
         height: 100%;
         background-color: #edf2f7;
         padding: 20px;
@@ -91,14 +92,16 @@
       }
 
       .custom-list {
-        list-style: none; /* Removes the bullet points */
+        list-style: none;
+        /* Removes the bullet points */
       }
 
       /* .custom-list li a {
     color: #fff; 
 } */
       .custom-list li {
-        margin-bottom: 1.5rem; /* Adds vertical space between list items */
+        margin-bottom: 1.5rem;
+        /* Adds vertical space between list items */
       }
 
       .custom-list li a {
@@ -111,15 +114,18 @@
       }
 
       .custom-list li a.view {
-        background-color: #007bff; /* Blue color for view button */
+        background-color: #007bff;
+        /* Blue color for view button */
       }
 
       .custom-list li a.update {
-        background-color: #28a745; /* Green color for update button */
+        background-color: #28a745;
+        /* Green color for update button */
       }
 
       .custom-list li a.delete {
-        background-color: #dc3545; /* Red color for delete button */
+        background-color: #dc3545;
+        /* Red color for delete button */
       }
 
       .custom-list li a:hover {
@@ -128,6 +134,7 @@
       }
     </style>
   </head>
+
   <body>
     <div
       class="simple-grid"
@@ -168,7 +175,7 @@
           </tr>
         </thead>
         <tbody>
-          <% products.forEach((product, index) => { %>
+          <% products.forEach((product, index)=> { %>
           <tr>
             <td>
               <img
@@ -179,7 +186,7 @@
             </td>
             <td>
               <div class="vstack" style="display: flex; flex-direction: column">
-                <span style="font-weight: bold"><%= product.title %></span>
+                <span style="font-weight: bold"> <%= product.title %> </span>
                 <span style="font-size: large; color: green"
                   >₹ <%= product.price %></span
                 >
@@ -187,9 +194,9 @@
             </td>
             <td>
               <div class="vstack" style="display: flex; flex-direction: column">
-                <span style="font-weight: lighter"
-                  ><%= product.category %></span
-                >
+                <span style="font-weight: lighter">
+                  <%= product.category %>
+                </span>
                 <span style="font-size: large; color: lightseagreen"
                   >Publisher: <%= product.publisher %></span
                 >

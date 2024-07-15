@@ -8,8 +8,8 @@
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-   <!-- <link rel="stylesheet" href="/stylo.css"> -->
-   <link rel="stylesheet" href="/style.css">
+  <!-- <link rel="stylesheet" href="/stylo.css"> -->
+  <link rel="stylesheet" href="/style.css">
 
   <style>
     body,
@@ -167,7 +167,7 @@
 
     .poor {
       background-color: red;
-    } 
+    }
   </style>
 
 <body>
@@ -281,14 +281,14 @@
             </h5>
             <h5>Owner: <%= book.user %>
             </h5>
-             <h5>Category: <%= book.category%>
+            <h5>Category: <%= book.category%>
             </h5>
             <h5>Condition: <span id="book-condition" class="<%= book.condition %>">
                 <%= book.condition %>
               </span></h5>
             <!-- <a href="chat.html?username=<%= book.user %>&bookId=<%= book._id %>">Chat with owner</a> -->
           </div>
-         <a href="https://wa.me/<%= book.userphn %>" target="_blank">Chat with owner on WhatsApp</a>
+          <a href="https://wa.me/<%= book.userphn %>" target="_blank">Chat with owner on WhatsApp</a>
         </div>
 
       </div>
@@ -300,29 +300,29 @@
     </div>
 
 
-  <!-- Star Rating -->
-  <div class="review-all">
-    <div class="star-rating">
-      <div class="stars">
-        <span class="star" data-rating="1">&#9733;</span>
-        <span class="star" data-rating="2">&#9733;</span>
-        <span class="star" data-rating="3">&#9733;</span>
-        <span class="star" data-rating="4">&#9733;</span>
-        <span class="star" data-rating="5">&#9733;</span>
+    <!-- Star Rating -->
+    <div class="review-all">
+      <div class="star-rating">
+        <div class="stars">
+          <span class="star" data-rating="1">&#9733;</span>
+          <span class="star" data-rating="2">&#9733;</span>
+          <span class="star" data-rating="3">&#9733;</span>
+          <span class="star" data-rating="4">&#9733;</span>
+          <span class="star" data-rating="5">&#9733;</span>
+        </div>
+        <div class="rating-value"></div>
       </div>
-      <div class="rating-value"></div>
-    </div>
 
-    <div class="review-written">
-      <textarea id="review" placeholder="Write your review here..."></textarea>
-    </div>
-    <div class="btns">
-      <button id="submit-review-btn">Submit</button>
-    </div>
+      <div class="review-written">
+        <textarea id="review" placeholder="Write your review here..."></textarea>
+      </div>
+      <div class="btns">
+        <button id="submit-review-btn">Submit</button>
+      </div>
 
-    <div class="review-written-values"></div>
-    
-  </div>
+      <div class="review-written-values"></div>
+
+    </div>
 
   </div>
 
@@ -352,11 +352,11 @@
       window.location.href = "newPage.html?title=" + encodeURIComponent(title) + "&price=" + encodeURIComponent(price) + "&image=" + encodeURIComponent(image) + "&mail=" + encodeURIComponent(mail);
     }
   </script>
-<!-- <script async type="text/javascript" src="https://collectcdn.com/embed.js"></script>
+  <!-- <script async type="text/javascript" src="https://collectcdn.com/embed.js"></script>
 <iframe src="https://links.collect.chat/662e813f3e99425e992d0f5c"  width="100%" height="600" frameBorder="0"></iframe> -->
-  
+
   <script>
-    
+
     document.addEventListener('DOMContentLoaded', async function () {
       const stars = document.querySelectorAll('.star');
       const ratingValue = document.querySelector('.rating-value');
@@ -445,7 +445,7 @@
               rating: userRating,
               review: reviewText,
               bookimg: '<%= book.image %>',
-              name: '<%= user ? user.name : "Anonymous" %>' 
+              name: '<%= user ? user.name : "Anonymous" %>'
             });
             console.log("Review submitted successfully:", response.data);
             reviewWrittenContainer.style.display = 'none';
@@ -460,7 +460,7 @@
           alert("Please log in first before submitting a review.");
           reviewTextarea.value = '';
           userRating = null;
-          updateStars(0); 
+          updateStars(0);
           reviewwrittenvalues.innerText = '';
           reviewAllContainer.appendChild(reviewwrittenvalues);
           ratingValue.innerHTML = '';
