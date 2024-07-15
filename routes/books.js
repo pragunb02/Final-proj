@@ -189,11 +189,14 @@ router.get("/deletebook/:id", async (req, res) => {
     }
 
     const imagePublicId = book.image.split("/").slice(-1)[0].split(".")[0];
-    cloudinary.uploader.destroy(imagePublicId, (error, result) => {
-      if (error) {
-        console.error("Error deleting image:", error);
-      }
-    });
+
+    // Call the delete function from cloudinary.js
+    const deleteResult = await deleteFromCloudinary(imagePublicId);
+    if (deleteResult && deleteResult.result === "ok") {
+      console.log("Image deleted successfully from Cloudinary.");
+    } else {
+      console.error("Image deletion failed or not found.");
+    }
 
     res.json({ success: true, message: "Book deleted successfully." });
   } catch (error) {
