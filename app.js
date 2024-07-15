@@ -23,8 +23,9 @@ const mongoUri = process.env.MONGO_URI_PRODUCTION;
 
 mongoose
   .connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useCreateIndex: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true
   })
   .then(() => {
     console.log("MongoDB connected");
