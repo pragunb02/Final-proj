@@ -298,6 +298,7 @@ app.get("/categories", async (req, res) => {
   try {
     // Query MongoDB to find all distinct categories
     const categories = await Book.distinct("category").exec();
+    const user = req.session.user;
 
     // Group books by category
     const groupedBooks = {};
@@ -306,7 +307,7 @@ app.get("/categories", async (req, res) => {
     }
 
     // Render the categories.ejs template and pass groupedBooks to it
-    res.render("categories", { groupedBooks, showDropdown });
+    res.render("categories", { groupedBooks, showDropdown, user });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
