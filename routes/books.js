@@ -4,7 +4,10 @@ const path = require("path");
 const router = express.Router();
 const Book = require("../models/Book");
 const upload = require("../middleware/multer.middleware.js"); // Adjust path as necessary
-const { uploadOnCloudinary } = require("../utils/cloudinary"); // Adjust path as necessary
+const {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinary"); // Adjust path as necessary
 const { spawn } = require("child_process");
 const User = require("../models/User");
 const fs = require("fs");
