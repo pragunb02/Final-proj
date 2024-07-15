@@ -1,35 +1,35 @@
 const express = require("express");
-const router = express.Router();
-const Book = require("../models/Book"); // Import the Book model
-const multer = require("multer");
-const { spawn } = require("child_process");
-const fs = require("fs");
 const path = require("path");
+
+const router = express.Router();
+const Book = require("../models/Book");
+const upload = require("../middleware/multer.middleware.js"); // Adjust path as necessary
+const { uploadOnCloudinary } = require("../utils/cloudinary"); // Adjust path as necessary
+const { spawn } = require("child_process");
 const User = require("../models/User");
+const fs = require("fs");
 
-// Configure multer for handling file uploads
-const storage = multer.diskStorage({
-  // Configuration for file storage
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads"); // Store the uploaded images in the "public/uploads" directory
-  },
-  filename: function (req, file, cb) {
-    // cb(null, Date.now() + '-' + file.originalname); // Generate unique file names
-    const uniqueFilename = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueFilename);
-    // Save the unique filename to the request object so it can be accessed in the route handler
-    req.uniqueFilename = uniqueFilename;
-  },
-});
+// // Configure multer for handling file uploads
+// const storage = multer.diskStorage({
+//   // Configuration for file storage
+//   destination: function (req, file, cb) {
+//     cb(null, "public/uploads"); // Store the uploaded images in the "public/uploads" directory
+//   },
+//   filename: function (req, file, cb) {
+//     // cb(null, Date.now() + '-' + file.originalname); // Generate unique file names
+//     const uniqueFilename = `${Date.now()}-${file.originalname}`;
+//     cb(null, uniqueFilename);
+//     // Save the unique filename to the request object so it can be accessed in the route handler
+//     req.uniqueFilename = uniqueFilename;
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 function isAuthenticated(req, res, next) {
   if (req.session && req.session.user) {
-    // User is authenticated
     return next();
   } else {
-    // User is not authenticated, display an alert message
     return res
       .status(401)
       .json({ error: "You must be logged in to access this feature." });
@@ -37,7 +37,6 @@ function isAuthenticated(req, res, next) {
 }
 
 router.get("/checkAuthentication", isAuthenticated, (req, res) => {
-  // If the user is authenticated, return a JSON response
   res.json({ isAuthenticated: true });
 });
 
@@ -47,7 +46,6 @@ router.post(
   isAuthenticated,
   upload.single("image"),
   async (req, res) => {
-    // Book addition logic
     const userEmail = req.session.user.email;
     try {
       // Extract book data from the request body and file
@@ -63,15 +61,27 @@ router.post(
         category,
         condition,
       } = req.body;
+
       const user = req.session.user.name;
       const userphn = req.session.user.phone;
-      const filename = `/uploads/${req.uniqueFilename}`;
+
+      const filename = req.file.filename;
+      const filePath = path.join("public", "uploads", filename);
+      console.log(filename);
+      console.log(filePath);
+
+      console.log("Uploaded file name:", filename);
 
       // Call the Python script to process the image
       const python = spawn("python", ["./script.py", filename]);
-      let processedImage;
+
+      // Log output from Python script
       python.stdout.on("data", (data) => {
-        processedImage = data.toString();
+        console.log(`Python stdout: ${data}`);
+      });
+
+      python.stderr.on("data", (data) => {
+        console.error(`Python stderr: ${data}`);
       });
 
       // Wait for the Python script to finish
@@ -82,8 +92,17 @@ router.post(
             .status(500)
             .json({ success: false, message: "Internal server error." });
         }
+        // Upload the image to Cloudinary
+        const result = await uploadOnCloudinary("public/uploads/" + filename);
+        if (!result) {
+          throw new Error("Failed to upload image to Cloudinary.");
+        }
 
-        // Create a new book object (assuming you have a schema and model for books in your database)
+        const cloudinaryUrl = result.secure_url;
+
+        console.log("Uploaded file URL:", cloudinaryUrl);
+
+        // Create a new book object
         const newBook = new Book({
           user,
           title,
@@ -93,7 +112,7 @@ router.post(
           price,
           publisher,
           language,
-          image: filename, // Save the path to the processed image in the database
+          image: cloudinaryUrl, // Save the path to the processed image in the database
           userEmail,
           quantity,
           category,
@@ -102,6 +121,8 @@ router.post(
         });
 
         // Save the book to the database
+        console.log(filename);
+        console.log(filePath);
         await newBook.save();
 
         res
@@ -138,18 +159,21 @@ router.post(
   upload.single("profilePic"),
   async (req, res) => {
     try {
+      const localFilePath = req.file.path;
+      const result = await uploadOnCloudinary(localFilePath);
+      const profilePicUrl = result.secure_url;
+
       // Find the user and update their profilePic field
       const updatedUser = await User.findOneAndUpdate(
         { email: req.session.user.email },
-        { profilePic: "/uploads/" + req.file.filename },
-        { new: true } // This option returns the updated document
+        { profilePic: profilePicUrl },
+        { new: true }
       );
 
       if (!updatedUser) {
         return res.status(404).send("User not found");
       }
 
-      // res.send('Success: File Uploaded!');
       res.redirect("/userprofile");
     } catch (err) {
       console.error(err);
@@ -161,7 +185,6 @@ router.post(
 // Route to delete a book
 router.get("/deletebook/:id", async (req, res) => {
   try {
-    // Find the book by its ID and delete it
     const book = await Book.findByIdAndDelete(req.params.id);
 
     if (!book) {
@@ -170,11 +193,10 @@ router.get("/deletebook/:id", async (req, res) => {
         .json({ success: false, message: "Book not found." });
     }
 
-    // Remove the associated image file from the uploads folder
-    const imagePath = path.join(__dirname, "..", "public", book.image);
-    fs.unlink(imagePath, (err) => {
-      if (err) {
-        console.error("Error deleting image:", err);
+    const imagePublicId = book.image.split("/").slice(-1)[0].split(".")[0];
+    cloudinary.uploader.destroy(imagePublicId, (error, result) => {
+      if (error) {
+        console.error("Error deleting image:", error);
       }
     });
 
@@ -192,7 +214,6 @@ router.get("/products/:id/update", async (req, res) => {
     if (!product) {
       return res.status(404).send("Product not found");
     }
-    // Render your update form here
     res.render("updateForm", { product });
   } catch (error) {
     console.error(error);
@@ -226,7 +247,6 @@ router.post("/:id/update", async (req, res) => {
       quantity,
     });
     res.redirect("back");
-    // res.redirect('/admin'); // Redirect to the products page or any other appropriate page
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

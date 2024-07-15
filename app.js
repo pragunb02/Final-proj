@@ -19,6 +19,7 @@ const User = require("./models/User");
 require("dotenv").config();
 // Database connection setup
 const mongoUri = process.env.MONGO_URI_PRODUCTION;
+// const mongoUri = process.env.MONGO_URI_LOCAL;
 
 mongoose
   .connect(mongoUri, {
