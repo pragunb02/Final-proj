@@ -153,7 +153,7 @@ app.get("/get-logged-in-user-id", (req, res) => {
   }
 });
 
-app.get("/bookDetails", async (req, res) => {
+app.get("/bookdetails", async (req, res) => {
   const bookId = req.query.id; // Get the book ID from the query parameter
   const user = req.session.user;
   try {
