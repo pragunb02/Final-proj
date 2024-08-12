@@ -9,9 +9,10 @@
   <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <!-- <link rel="stylesheet" href="/stylo.css"> -->
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/bookdetailsStyle.css">
+    <link rel="stylesheet" href="/style.css">
 
-  <style>
+  <!-- <style>
     body,
     h1,
     h2,
@@ -168,7 +169,7 @@
     .poor {
       background-color: red;
     }
-  </style>
+  </style> -->
 
 <body>
 
@@ -271,31 +272,30 @@
               </span></p>
 
             <h3>Product Details</h3>
-            <h5>Author: <%= book.author %>
-            </h5>
-            <h5>Publisher: <%= book.publisher %>
-            </h5>
-            <h5>Language: <%= book.language %>
-            </h5>
-            <h5>Description: <%= book.description %>
-            </h5>
-            <h5>Owner: <%= book.user %>
-            </h5>
-            <h5>Category: <%= book.category%>
-            </h5>
-            <h5>Condition: <span id="book-condition" class="<%= book.condition %>">
+            <h5>Author: <strong><%= book.author %></strong></h5>
+<h5>Publisher: <strong><%= book.publisher %></strong></h5>
+<h5>Language: <strong><%= book.language %></strong></h5>
+<h5>Description: <strong><%= book.description %></strong></h5>
+<h5>Owner: <strong><%= book.user %></strong></h5>
+<h5>Category: <strong><%= book.category%></strong></h5>
+            <!-- <h5>Condition: <span id="book-condition" class="<%= book.condition %>">
                 <%= book.condition %>
-              </span></h5>
+              </span></h5> -->
+              <h5>Condition: <span id="book-condition" class="<%= book.condition.toLowerCase().replace(' ', '-') %>"><%= book.condition %></span></h5>
             <!-- <a href="chat.html?username=<%= book.user %>&bookId=<%= book._id %>">Chat with owner</a> -->
           </div>
           <a href="https://wa.me/<%= book.userphn %>" target="_blank">Chat with owner on WhatsApp</a>
         </div>
 
       </div>
-      <div class="buy-section">
+      <!-- <div class="buy-section">
         <button onclick="buyNow()">Buy Now</button>
         <button class="btn add-to-cart" data-name="<%= book.title %>" data-price="<%= book.price %>"
           data-image="<%= book.image %>">Add to Cart</button>
+      </div> -->
+ <div class="buy-section">
+        <button onclick="buyNow()">Buy Now</button>
+        <button class="add-to-cart" data-name="<%= book.title %>" data-price="<%= book.price %>" data-image="<%= book.image %>">Add to Cart</button>
       </div>
     </div>
 
@@ -339,7 +339,7 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 
-  <script>
+  <!-- <script>
     function buyNow() {
       var title = '<%= book.title %>';
       var price = '<%= book.price %>';
@@ -351,13 +351,52 @@
       console.log("Mail:", mail);
       window.location.href = "newPage.html?title=" + encodeURIComponent(title) + "&price=" + encodeURIComponent(price) + "&image=" + encodeURIComponent(image) + "&mail=" + encodeURIComponent(mail);
     }
-  </script>
+  </script> -->
   <!-- <script async type="text/javascript" src="https://collectcdn.com/embed.js"></script>
 <iframe src="https://links.collect.chat/662e813f3e99425e992d0f5c"  width="100%" height="600" frameBorder="0"></iframe> -->
 
-  <script>
+   <script>
+    // Declare loggedInUserId in the global scope
+    let loggedInUserId = null;
+
+    // Function to fetch the logged in user's ID
+    async function fetchLoggedInUserId() {
+      try {
+        const response = await axios.get('/get-logged-in-user-id');
+        return response.data.userId;
+      } catch (error) {
+        console.error("Error fetching logged in user ID:", error);
+        return null;
+      }
+    }
+
+    // Define the buyNow function in the global scope
+    async function buyNow() {
+      // Fetch the logged in user ID if it's not already set
+      if (loggedInUserId === null) {
+        loggedInUserId = await fetchLoggedInUserId();
+      }
+
+      if (loggedInUserId) {
+        var title = '<%= book.title %>';
+        var price = '<%= book.price %>';
+        var image = '<%= book.image %>';
+        var mail = '<%= book.userEmail %>';
+        
+        // Redirect to the new page with the encoded parameters
+        window.location.href = "newPage.html?title=" + encodeURIComponent(title) + 
+                              "&price=" + encodeURIComponent(price) + 
+                              "&image=" + encodeURIComponent(image) + 
+                              "&mail=" + encodeURIComponent(mail);
+      } else {
+        alert("Please log in before ordering!");
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', async function () {
+      // Fetch the logged in user ID when the page loads
+      loggedInUserId = await fetchLoggedInUserId();
+
       const stars = document.querySelectorAll('.star');
       const ratingValue = document.querySelector('.rating-value');
       const reviewwrittenvalues = document.querySelector('.review-written-values');
@@ -365,60 +404,33 @@
       const submitReviewBtn = document.getElementById('submit-review-btn');
       const reviewWrittenContainer = document.querySelector('.review-written');
       const reviewAllContainer = document.querySelector('.review-all');
-      const reviewMsgContainer = document.createElement('div');
-      const bookId = '<%= book._id %>'; // Replace this with the actual book ID
+      const bookId = '<%= book._id %>';
       const image = '<%= book.image %>';
 
       let userRating = null;
       let reviewText = '';
-      let loggedInUserId = null; // Variable to store logged in user ID
 
-
-      // Function to fetch the logged in user's ID
-      async function fetchLoggedInUserId() {
-        try {
-          const response = await axios.get('/get-logged-in-user-id');
-          return response.data.userId; // Assuming the server returns the logged in user's ID
-        } catch (error) {
-          if (error.response && error.response.status === 401) {
-            // Handle 401 Unauthorized error
-            // alert("Please log in first before submitting a review.");
-          } else {
-            console.error("Error fetching logged in user ID:", error);
-          }
-          return null;
-        }
-      }
-
-
-      loggedInUserId = await fetchLoggedInUserId();
       async function fetchUserRatingReview() {
         try {
           const response = await axios.get(`/user-rating-review?bookId=${bookId}`);
-          return response.data; // Returns user's rating and review or null if not rated
+          return response.data;
         } catch (error) {
           console.error("Error fetching user rating and review:", error);
           return null;
         }
       }
 
-
       const userRatingReview = await fetchUserRatingReview();
+
       if (userRatingReview && userRatingReview.rating) {
         userRating = userRatingReview.rating;
         ratingValue.innerHTML = 'Your rating: ' + userRating + ' stars.';
         updateStars(userRating);
       }
+
       if (userRatingReview && userRatingReview.review) {
         reviewText = userRatingReview.review;
-        reviewwrittenvalues.innerText = reviewText;
-        reviewAllContainer.appendChild(reviewwrittenvalues);
-        document.querySelectorAll('.btns').forEach(btn => {
-          btn.style.display = 'none';
-        });
-        document.querySelectorAll('.review-written').forEach(reviewWritten => {
-          reviewWritten.style.display = 'none';
-        });
+        displaySubmittedReview(userRating, reviewText);
       }
 
       stars.forEach(function (star) {
@@ -448,22 +460,14 @@
               name: '<%= user ? user.name : "Anonymous" %>'
             });
             console.log("Review submitted successfully:", response.data);
-            reviewWrittenContainer.style.display = 'none';
-            submitReviewBtn.style.display = 'none';
-            reviewMsgContainer.textContent = reviewText;
-            reviewAllContainer.appendChild(reviewMsgContainer);
+            displaySubmittedReview(userRating, reviewText);
           } catch (error) {
             console.error("Error submitting review:", error);
           }
         } else {
           console.error("User not logged in");
           alert("Please log in first before submitting a review.");
-          reviewTextarea.value = '';
-          userRating = null;
-          updateStars(0);
-          reviewwrittenvalues.innerText = '';
-          reviewAllContainer.appendChild(reviewwrittenvalues);
-          ratingValue.innerHTML = '';
+          resetReviewForm();
         }
       });
 
@@ -476,9 +480,54 @@
           }
         });
       }
+
+      function displaySubmittedReview(rating, review) {
+        const s1 = document.querySelector(".review-written-values");
+        const s2 = document.querySelector(".star-rating");
+        const s3 = document.querySelector(".btns");
+        const s4 = document.querySelector(".review-written");
+
+        if (reviewTextarea) {
+          reviewTextarea.value = review;
+          reviewTextarea.setAttribute('readonly', 'readonly');
+        }
+
+        if (ratingValue) {
+          ratingValue.innerHTML = 'Your rating: ' + rating + ' stars.';
+        }
+
+        updateStars(rating);
+
+        if (submitReviewBtn) {
+          submitReviewBtn.style.display = 'none';
+        }
+        
+        const submittedReviewDiv = document.createElement('div');
+        submittedReviewDiv.classList.add('submitted-review');
+        submittedReviewDiv.innerHTML = `
+          <p>Your rating: <span class="submitted-rating">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span></p>
+          <p>Your review: ${review}</p>
+        `;
+        
+        if (reviewAllContainer) {
+          reviewAllContainer.appendChild(submittedReviewDiv);
+        }
+        [s1, s2, s3, s4].forEach(element => {
+          if (element) {
+            element.style.display = "none";
+          }
+        });
+      }
+
+      function resetReviewForm() {
+        reviewTextarea.value = '';
+        userRating = null;
+        updateStars(0);
+        reviewwrittenvalues.innerText = '';
+        ratingValue.innerHTML = '';
+      }
     });
   </script>
 
 </body>
-
 </html>
