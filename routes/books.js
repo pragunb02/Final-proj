@@ -93,7 +93,6 @@ router.post(
         console.error(`Python stderr: ${data}`);
       });
 
-      // Wait for the Python script to finish
       python.on("close", async (code) => {
         if (code !== 0) {
           console.error("Python script exited with code", code);
