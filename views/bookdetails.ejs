@@ -193,17 +193,17 @@
         <a href="#" class="fas fa-shopping-cart"></a>
         <div id="login-btn" class="fas fa-user" onclick="toggleDropdown()"></div>
         <% if (showDropdown) { %>
-          <div id="account-options" style="display: none;">
-            <div class="user-profile">
-              <span>Welcome, <%= user.name %></span>
-            </div>
-            <ul>
-              <a href="/userprofile">Profile</a>
-              <a href="#">Orders</a>
-              <button id="logoutButton">Logout</button>
-            </ul>
+        <div id="account-options" style="display: none;">
+          <div class="user-profile">
+            <span>Welcome, <%= user.name %></span>
           </div>
-          <% } %>
+          <ul>
+            <a href="/userprofile">Profile</a>
+            <a href="#">Orders</a>
+            <button id="logoutButton">Logout</button>
+          </ul>
+        </div>
+        <% } %>
       </div>
 
     </div>
@@ -273,15 +273,15 @@
 
             <h3>Product Details</h3>
             <h5>Author: <strong><%= book.author %></strong></h5>
-<h5>Publisher: <strong><%= book.publisher %></strong></h5>
-<h5>Language: <strong><%= book.language %></strong></h5>
-<h5>Description: <strong><%= book.description %></strong></h5>
-<h5>Owner: <strong><%= book.user %></strong></h5>
-<h5>Category: <strong><%= book.category%></strong></h5>
+            <h5>Publisher: <strong><%= book.publisher %></strong></h5>
+            <h5>Language: <strong><%= book.language %></strong></h5>
+            <h5>Description: <strong><%= book.description %></strong></h5>
+            <h5>Owner: <strong><%= book.user %></strong></h5>
+            <h5>Category: <strong><%= book.category%></strong></h5>
             <!-- <h5>Condition: <span id="book-condition" class="<%= book.condition %>">
                 <%= book.condition %>
               </span></h5> -->
-              <h5>Condition: <span id="book-condition" class="<%= book.condition.toLowerCase().replace(' ', '-') %>"><%= book.condition %></span></h5>
+            <h5>Condition: <span id="book-condition" class="<%= book.condition.toLowerCase().replace(' ', '-') %>"><%= book.condition %></span></h5>
             <!-- <a href="chat.html?username=<%= book.user %>&bookId=<%= book._id %>">Chat with owner</a> -->
           </div>
           <a href="https://wa.me/<%= book.userphn %>" target="_blank">Chat with owner on WhatsApp</a>
@@ -293,7 +293,7 @@
         <button class="btn add-to-cart" data-name="<%= book.title %>" data-price="<%= book.price %>"
           data-image="<%= book.image %>">Add to Cart</button>
       </div> -->
- <div class="buy-section">
+      <div class="buy-section">
         <button onclick="buyNow()">Buy Now</button>
         <button class="add-to-cart" data-name="<%= book.title %>" data-price="<%= book.price %>" data-image="<%= book.image %>">Add to Cart</button>
       </div>
@@ -355,7 +355,7 @@
   <!-- <script async type="text/javascript" src="https://collectcdn.com/embed.js"></script>
 <iframe src="https://links.collect.chat/662e813f3e99425e992d0f5c"  width="100%" height="600" frameBorder="0"></iframe> -->
 
-   <script>
+  <script>
     // Declare loggedInUserId in the global scope
     let loggedInUserId = null;
 
@@ -382,18 +382,18 @@
         var price = '<%= book.price %>';
         var image = '<%= book.image %>';
         var mail = '<%= book.userEmail %>';
-        
+
         // Redirect to the new page with the encoded parameters
-        window.location.href = "newPage.html?title=" + encodeURIComponent(title) + 
-                              "&price=" + encodeURIComponent(price) + 
-                              "&image=" + encodeURIComponent(image) + 
-                              "&mail=" + encodeURIComponent(mail);
+        window.location.href = "newPage.html?title=" + encodeURIComponent(title) +
+          "&price=" + encodeURIComponent(price) +
+          "&image=" + encodeURIComponent(image) +
+          "&mail=" + encodeURIComponent(mail);
       } else {
         alert("Please log in before ordering!");
       }
     }
 
-    document.addEventListener('DOMContentLoaded', async function () {
+    document.addEventListener('DOMContentLoaded', async function() {
       // Fetch the logged in user ID when the page loads
       loggedInUserId = await fetchLoggedInUserId();
 
@@ -433,8 +433,8 @@
         displaySubmittedReview(userRating, reviewText);
       }
 
-      stars.forEach(function (star) {
-        star.addEventListener('click', function () {
+      stars.forEach(function(star) {
+        star.addEventListener('click', function() {
           if (!userRating) {
             const rating = parseInt(star.getAttribute('data-rating'));
             ratingValue.innerHTML = 'You rated this ' + rating + ' stars.';
@@ -444,11 +444,11 @@
         });
       });
 
-      reviewTextarea.addEventListener('input', function () {
+      reviewTextarea.addEventListener('input', function() {
         reviewText = reviewTextarea.value.trim();
       });
 
-      submitReviewBtn.addEventListener('click', async function () {
+      submitReviewBtn.addEventListener('click', async function() {
         if (loggedInUserId) {
           try {
             const response = await axios.post('/submit-rating-review', {
@@ -472,7 +472,7 @@
       });
 
       function updateStars(rating) {
-        stars.forEach(function (s, index) {
+        stars.forEach(function(s, index) {
           if (index < rating) {
             s.classList.add("active");
           } else {
@@ -501,14 +501,14 @@
         if (submitReviewBtn) {
           submitReviewBtn.style.display = 'none';
         }
-        
+
         const submittedReviewDiv = document.createElement('div');
         submittedReviewDiv.classList.add('submitted-review');
         submittedReviewDiv.innerHTML = `
           <p>Your rating: <span class="submitted-rating">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span></p>
           <p>Your review: ${review}</p>
         `;
-        
+
         if (reviewAllContainer) {
           reviewAllContainer.appendChild(submittedReviewDiv);
         }
@@ -530,4 +530,5 @@
   </script>
 
 </body>
+
 </html>
