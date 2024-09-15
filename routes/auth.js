@@ -201,7 +201,7 @@ router.post("/forgot-password", async (req, res) => {
     };
     const otpExpiration = 15 * 60;
     const token = jwt.sign(payload, secret, { expiresIn: otpExpiration });
-    const link = `http://localhost:3000/auth/password-reset/${userInDatabase.id}/${token}`;
+    const link = `https://bookbazaar-duqs.onrender.com/auth/password-reset/${userInDatabase.id}/${token}`;
     // Send a confirmation email to the registered user
     sendEmail(email, "Reset Password", link);
     //  ??????????????  send mail
